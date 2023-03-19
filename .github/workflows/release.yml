@@ -1,0 +1,37 @@
+name: test
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  run:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install packages
+        run: sudo apt-get install -y gcc-riscv64-linux-gnu
+
+      - name: Configure
+        run: make defconfig
+        env:
+          ARCH: riscv64
+          CROSS_COMPILE: riscv64-linux-gnu-
+
+      - name: Build
+        run: make -j$(nproc)
+        env:
+          ARCH: riscv64
+          CROSS_COMPILE: riscv64-linux-gnu-
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: busybox
+          asset_name: busybox
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "Release"
