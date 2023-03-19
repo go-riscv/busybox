@@ -1,0 +1,26 @@
+name: test
+on:
+  workflow_call:
+  push:
+
+jobs:
+  run:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install packages
+        run: sudo apt-get install -y gcc-riscv64-linux-gnu
+
+      - name: Configure
+        run: make defconfig
+        env:
+          ARCH: riscv64
+          CROSS_COMPILE: riscv64-linux-gnu-
+
+      - name: Build
+        run: make -j$(nproc)
+        env:
+          ARCH: riscv64
+          CROSS_COMPILE: riscv64-linux-gnu-
